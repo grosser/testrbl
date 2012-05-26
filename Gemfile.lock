@@ -16,6 +16,11 @@ GEM
     rspec-expectations (2.6.0)
       diff-lcs (~> 1.1.2)
     rspec-mocks (2.6.0)
+    shoulda (3.0.1)
+      shoulda-context (~> 1.0.0)
+      shoulda-matchers (~> 1.0.0)
+    shoulda-context (1.0.0)
+    shoulda-matchers (1.0.0)
 
 PLATFORMS
   ruby
@@ -24,3 +29,4 @@ DEPENDENCIES
   rake
   rspec (~> 2)
   run_test!
+  shoulda
