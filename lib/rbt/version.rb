@@ -1,3 +1,3 @@
-module RunTest
+module RBT
   VERSION = '0.0.0'
 end

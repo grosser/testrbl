@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RunTest do
+describe RBT do
   around do |example|
     run "rm -rf tmp && mkdir tmp"
     Dir.chdir "tmp" do
@@ -15,6 +15,10 @@ describe RunTest do
     result
   end
 
+  def rbt(command, options={})
+    run "#{File.expand_path("../../bin/rbt", __FILE__)} #{command}", options
+  end
+
   def write(file, content)
     folder = File.dirname(file)
     run "mkdir -p #{folder}" unless File.exist?(folder)
@@ -22,7 +26,7 @@ describe RunTest do
   end
 
   it "has a VERSION" do
-    RunTest::VERSION.should =~ /^[\.\da-z]+$/
+    RBT::VERSION.should =~ /^[\.\da-z]+$/
   end
 
   context "with a simple setup" do
@@ -43,25 +47,25 @@ describe RunTest do
     end
 
     it "runs by exact line" do
-      result = run "../../bin/rtest a_test.rb:4"
+      result = rbt "a_test.rb:4"
       result.should include "ABC\n"
       result.should_not include "BCD"
     end
 
     it "runs by above a line" do
-      result = run "../../bin/rtest a_test.rb:5"
+      result = rbt "a_test.rb:5"
       result.should include "ABC\n"
       result.should_not include "BCD"
     end
 
     it "does not run when line is before test" do
-      result = run "../../bin/rtest a_test.rb:3", :fail => true
-      result.should include "no test found before line 3\n"
+      result = rbt "a_test.rb:3", :fail => true
+      result.should include "no test found before line 3"
       result.should_not include "ABC"
     end
 
     it "runs whole file without number" do
-      result = run "../../bin/rtest a_test.rb"
+      result = rbt "a_test.rb"
       result.should include "ABC\n"
       result.should include "BCD"
     end
@@ -96,14 +100,14 @@ describe RunTest do
     end
 
     it "runs should" do
-      result = run "../../bin/rtest a_test.rb:9"
+      result = rbt "a_test.rb:9"
       result.should_not include "ABC\n"
       result.should include "BCD\n"
       result.should_not include "CDE\n"
     end
 
     it "runs context" do
-      result = run "../../bin/rtest a_test.rb:13"
+      result = rbt "a_test.rb:13"
       result.should_not include "ABC\n"
       result.should_not include "BCD\n"
       result.should include "CDE\n"
@@ -155,14 +159,14 @@ describe RunTest do
     end
 
     it "runs a folder with subfolders" do
-      result = run "../../bin/rtest a"
+      result = rbt "a"
       result.should_not include "ABC\n"
       result.should include "BCD\n"
       result.should include "CDE\n"
     end
 
     it "runs files and folders" do
-      result = run "../../bin/rtest a/b a/c/c_test.rb"
+      result = rbt "a/b a/c/c_test.rb"
       result.should_not include "ABC\n"
       result.should_not include "BCD\n"
       result.should include "CDE\n"
@@ -170,7 +174,7 @@ describe RunTest do
     end
 
     it "runs multiple files" do
-      result = run "../../bin/rtest a/b/c_test.rb a/c/c_test.rb"
+      result = rbt "a/b/c_test.rb a/c/c_test.rb"
       result.should_not include "ABC\n"
       result.should_not include "BCD\n"
       result.should include "CDE\n"
@@ -178,7 +182,7 @@ describe RunTest do
     end
 
     it "fails with multiple files with lines" do
-      run "../../bin/rtest a/b/c_test.rb:4 a/c/c_test.rb", :fail => true
+      rbt "a/b/c_test.rb:4 a/c/c_test.rb", :fail => true
     end
   end
 end

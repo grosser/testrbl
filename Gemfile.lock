@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    run_test (0.0.0)
+    rbt (0.0.0)
 
 GEM
   remote: http://rubygems.org/
@@ -27,6 +27,6 @@ PLATFORMS
 
 DEPENDENCIES
   rake
+  rbt!
   rspec (~> 2)
-  run_test!
   shoulda

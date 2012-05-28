@@ -1,6 +1,6 @@
-require 'run_test/version'
+require 'rbt/version'
 
-module RunTest
+module RBT
   def self.run_from_cli(argv)
     pattern = nil
     tests = argv.map do |file|
@@ -8,7 +8,7 @@ module RunTest
         pattern = pattern_from_file(file)
         file.split(":").first
       elsif File.directory?(file)
-        Dir["#{file}/**/*_test.rb"]
+        Dir["#{file.sub(/\/$/,"")}/**/*_test.rb"]
       else
         file
       end
@@ -23,7 +23,7 @@ module RunTest
     end
   end
 
-  def run(command)
+  def self.run(command)
     command = "bundle exec ruby #{command}"
     puts command
     exec command
@@ -31,7 +31,7 @@ module RunTest
 
   private
 
-  def pattern_from_file(file)
+  def self.pattern_from_file(file)
     file, line = file.split(':')
     content = File.readlines(file)
     search = content[0..(line.to_i-1)].reverse
@@ -48,7 +48,7 @@ module RunTest
     raise "no test found before line #{line}"
   end
 
-  def run_files(tests)
+  def self.run_files(tests)
     require_list = tests.map { |filename| %{"./#{filename}"} }.join(",")
     run "-e '[#{require_list}].each {|f| require f }'" # TODO  -- #{options[:test_options]}
   end
