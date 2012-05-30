@@ -17,6 +17,8 @@ module Testrbl
   end
 
   def self.run(command)
+    safe_to_bundle_exec = (File.exist?('Gemfile.lock') and File.read('Gemfile.lock').include?(" test-unit "))
+    command = "#{"bundle exec " if safe_to_bundle_exec}#{command} --use-color=yes"
     puts command
     exec command
   end

@@ -13,7 +13,6 @@ Usage
 
 TODO
 ====
- - make colors show in 1.9 (without using bundle exec and adding test-runit to gemfile) [stackoverflow](http://stackoverflow.com/questions/10810107/ruby-how-to-get-colors-in-testrb)
  - prepend shoulda contexts to search -n '/OUTER-CONTEXT.*INNER-CONTEXT.*SHOULD/', make sure indentation is decreasing by 1 every step to avoid fetching everything
 
 Author
