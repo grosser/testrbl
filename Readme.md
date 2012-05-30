@@ -1,19 +1,24 @@
-Run ruby Test::Unit/Shoulda tests by line-number / folder / the dozen.
+Run ruby Test::Unit/Shoulda tests by line-number / folder / the dozen.<br/>
+(everything not matching "file:line" is simply passed to testrb)
 
 Install
 =======
-    gem install rbtest
-
+    gem install testrbl
 
 Usage
 =====
-    rbtest test/unit/xxx_test.rb:123                     # test by line number
-    rbtest test/unit test/unit                           # everything _test.rb in a folder
-    rbtest test/unit/xxx_test.rb test/unit/yyy_test.rb   # multiple files
+    testrbl test/unit/xxx_test.rb:123 # test by line number
+    testrbl test/unit                 # everything _test.rb in a folder (on 1.8 this would be test/unit/*)
+    testrbl xxx_test.rb yyy_test.rb   # multiple files
+
+TODO
+====
+ - make colors show in 1.9 (without using bundle exec and adding test-runit to gemfile) [stackoverflow](http://stackoverflow.com/questions/10810107/ruby-how-to-get-colors-in-testrb)
+ - prepend shoulda contexts to search -n '/OUTER-CONTEXT.*INNER-CONTEXT.*SHOULD/', make sure indentation is decreasing by 1 every step to avoid fetching everything
 
 Author
 ======
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
 License: MIT<br/>
-[![Build Status](https://secure.travis-ci.org/grosser/rbt.png)](http://travis-ci.org/grosser/rbt)
+[![Build Status](https://secure.travis-ci.org/grosser/testrbl.png)](http://travis-ci.org/grosser/testrbl)

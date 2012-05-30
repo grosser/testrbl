@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rbt (0.0.0)
+    testrbl (0.0.0)
 
 GEM
   remote: http://rubygems.org/
@@ -21,12 +21,14 @@ GEM
       shoulda-matchers (~> 1.0.0)
     shoulda-context (1.0.0)
     shoulda-matchers (1.0.0)
+    test-unit (2.4.4)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   rake
-  rbt!
   rspec (~> 2)
   shoulda
+  test-unit
+  testrbl!
