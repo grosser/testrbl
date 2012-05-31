@@ -11,6 +11,10 @@ Usage
     testrbl test/unit                 # everything _test.rb in a folder (on 1.8 this would be test/unit/*)
     testrbl xxx_test.rb yyy_test.rb   # multiple files
 
+Tips
+====
+ - `can't find executable testrb`: uninstall old version of test-unit, they define testrb in multiple incompatible ways
+
 TODO
 ====
  - prepend shoulda contexts to search -n '/OUTER-CONTEXT.*INNER-CONTEXT.*SHOULD/', make sure indentation is decreasing by 1 every step to avoid fetching everything
