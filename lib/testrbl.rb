@@ -13,6 +13,7 @@ module Testrbl
     end
 
     file, line = argv.first.split(':')
+    file = "./#{file}" if file =~ /^[a-z]/ # fix 1.9 not being able to load local files
     run "testrb #{file} #{pattern_from_file(file, line)}"
   end
 
