@@ -32,7 +32,6 @@ module Testrbl
 
     last_spaces = " " * 100
     found = search.map{|line| pattern_from_line(line) }.compact
-    puts found.inspect
 
     found.select! do |spaces, name|
       last_spaces = spaces if spaces.size < last_spaces.size
