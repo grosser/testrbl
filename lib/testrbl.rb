@@ -30,7 +30,7 @@ module Testrbl
     search = content[0..(line.to_i-1)].reverse
     search.each do |line|
       PATTERNS.each do |r|
-        return "-n '/#{Regexp.escape($1).gsub("'",".")}/'" if line =~ r
+        return "-n '/#{Regexp.escape($1).gsub("'",".").gsub("\\ "," ")}/'" if line =~ r
       end
     end
 
