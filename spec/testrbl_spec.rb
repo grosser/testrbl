@@ -77,6 +77,35 @@ describe Testrbl do
     end
   end
 
+  context "test with string" do
+    before do
+      write "a_test.rb", <<-RUBY
+        require 'test/unit'
+
+        class Xxx < Test::Unit::TestCase
+          test "a" do
+            puts 'ABC'
+          end
+
+          test "b" do
+            puts 'BCD'
+          end
+
+          test "c" do
+            puts 'CDE'
+          end
+        end
+      RUBY
+    end
+
+    it "runs test" do
+      result = testrbl "a_test.rb:8"
+      result.should_not include "ABC\n"
+      result.should include "BCD\n"
+      result.should_not include "CDE\n"
+    end
+  end
+
   context "shoulda" do
     before do
       write "a_test.rb", <<-RUBY
