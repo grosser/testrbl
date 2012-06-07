@@ -100,6 +100,10 @@ describe Testrbl do
             should "e" do
               puts 'DEF'
             end
+
+            should "..'?! [(" do
+              puts 'EFG'
+            end
           end
         end
       RUBY
@@ -110,6 +114,12 @@ describe Testrbl do
       result.should_not include "ABC\n"
       result.should include "BCD\n"
       result.should_not include "CDE\n"
+    end
+
+    it "runs stuff with regex special chars" do
+      result = testrbl "a_test.rb:22"
+      result.should_not include "DEF\n"
+      result.should include "EFG\n"
     end
 
     it "runs context" do
