@@ -2,8 +2,8 @@ require 'testrbl/version'
 
 module Testrbl
   PATTERNS = [
-    /^\s+(?:should|context|test)\s+['"](.*)['"]\s+do\s*$/,
-    /^\s+def\s+test_([a-z_\d]+)\s*$/
+    /^(\s+)(?:should|context|test)\s+['"](.*)['"]\s+do\s*$/,
+    /^(\s+)def\s+test_([a-z_\d]+)\s*$/
   ]
 
   def self.run_from_cli(argv)
@@ -14,7 +14,7 @@ module Testrbl
 
     file, line = argv.first.split(':')
     file = "./#{file}" if file =~ /^[a-z]/ # fix 1.9 not being able to load local files
-    run "testrb #{file} #{pattern_from_file(file, line)}"
+    run "testrb #{file} -n '/#{pattern_from_file(file, line)}/'"
   end
 
   def self.run(command)
@@ -29,12 +29,24 @@ module Testrbl
   def self.pattern_from_file(file, line)
     content = File.readlines(file)
     search = content[0..(line.to_i-1)].reverse
-    search.each do |line|
-      PATTERNS.each do |r|
-        return "-n '/#{Regexp.escape($1).gsub("'",".").gsub("\\ "," ")}/'" if line =~ r
-      end
+
+    last_spaces = " " * 100
+    found = search.map{|line| pattern_from_line(line) }.compact
+    puts found.inspect
+
+    found.select! do |spaces, name|
+      last_spaces = spaces if spaces.size < last_spaces.size
     end
 
+    return found.reverse.map(&:last).join(".*") if found.size > 0
+
     raise "no test found before line #{line}"
+  end
+
+  def self.pattern_from_line(line)
+    PATTERNS.each do |r|
+      return [$1, Regexp.escape($2).gsub("'",".").gsub("\\ "," ")] if line =~ r
+    end
+    nil
   end
 end

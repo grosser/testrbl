@@ -134,6 +134,12 @@ describe Testrbl do
               puts 'EFG'
             end
           end
+
+          context "g" do
+            should "a" do
+              puts "FGH"
+            end
+          end
         end
       RUBY
     end
@@ -157,6 +163,13 @@ describe Testrbl do
       result.should_not include "BCD\n"
       result.should include "CDE\n"
       result.should include "DEF\n"
+    end
+
+    it "runs via nested context" do
+      result = testrbl "a_test.rb:28"
+      result.should_not include "ABC\n"
+      result.should_not include "EFG\n"
+      result.should include "FGH\n"
     end
   end
 
