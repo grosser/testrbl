@@ -91,8 +91,12 @@ describe Testrbl do
             puts 'BCD'
           end
 
-          test "c" do
+          test "c d" do
             puts 'CDE'
+          end
+
+          test "c" do
+            puts 'DEF'
           end
         end
       RUBY
@@ -103,6 +107,12 @@ describe Testrbl do
       result.should_not include "ABC\n"
       result.should include "BCD\n"
       result.should_not include "CDE\n"
+    end
+
+    it "runs test explicitly" do
+      result = testrbl "a_test.rb:16"
+      result.should_not include "CDE\n"
+      result.should include "DEF\n"
     end
   end
 
@@ -135,10 +145,14 @@ describe Testrbl do
             end
           end
 
-          context "g" do
+          context "g a" do
             should "a" do
               puts "FGH"
             end
+          end
+
+          should "g" do
+            puts "GHI"
           end
         end
       RUBY
@@ -170,6 +184,13 @@ describe Testrbl do
       result.should_not include "ABC\n"
       result.should_not include "EFG\n"
       result.should include "FGH\n"
+    end
+
+    it "runs should explicitly" do
+      result = testrbl "a_test.rb:33"
+      result.should_not include "ABC\n"
+      result.should include "GHI\n"
+      result.should_not include "FGH\n"
     end
   end
 
@@ -237,6 +258,44 @@ describe Testrbl do
       result.should_not include "BCD\n"
       result.should include "CDE\n"
       result.should include "DEF\n"
+    end
+  end
+
+  describe ".pattern_from_line" do
+    def call(line)
+      Testrbl.pattern_from_line(line)
+    end
+
+    it "finds simple tests" do
+      call("  def test_xxx\n").should == ["  ", "xxx"]
+    end
+
+    it "does not find other methods" do
+      call("  def xxx\n").should == nil
+    end
+
+    it "finds calls with single quotes" do
+      call("  test 'xx xx' do\n").should == ["  ", "xx xx"]
+    end
+
+    it "finds test do calls" do
+      call("  test \"xx xx\" do\n").should == ["  ", "^test: xx xx$"]
+    end
+
+    it "finds should do calls" do
+      call("  should \"xx xx\" do\n").should == ["  ", "should xx xx. $"]
+    end
+
+    it "finds context do calls" do
+      call("  context \"xx xx\" do\n").should == ["  ", "xx xx"]
+    end
+
+    it "escapes regex chars" do
+      call("  context \"xx .* xx\" do\n").should == ["  ", "xx \\.\\* xx"]
+    end
+
+    it "escapes single quotes which we use to build the pattern" do
+      call("  context \"xx ' xx\" do\n").should == ["  ", "xx . xx"]
     end
   end
 end

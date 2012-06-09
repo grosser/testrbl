@@ -2,8 +2,8 @@ require 'testrbl/version'
 
 module Testrbl
   PATTERNS = [
-    /^(\s+)(?:should|context|test)\s+['"](.*)['"]\s+do\s*$/,
-    /^(\s+)def\s+test_([a-z_\d]+)\s*$/
+    /^(\s+)(should|context|test)\s+['"](.*)['"]\s+do\s*$/,
+    /^(\s+)def\s+(test_)([a-z_\d]+)\s*$/
   ]
 
   def self.run_from_cli(argv)
@@ -32,8 +32,7 @@ module Testrbl
 
     last_spaces = " " * 100
     found = search.map{|line| pattern_from_line(line) }.compact
-
-    found.select! do |spaces, name|
+    found = found.select do |spaces, name|
       last_spaces = spaces if spaces.size < last_spaces.size
     end
 
@@ -44,7 +43,21 @@ module Testrbl
 
   def self.pattern_from_line(line)
     PATTERNS.each do |r|
-      return [$1, Regexp.escape($2).gsub("'",".").gsub("\\ "," ")] if line =~ r
+      if line =~ r
+        whitespace, method, test_name = $1, $2, $3
+        regex = Regexp.escape(test_name).gsub("'",".").gsub("\\ "," ")
+
+        if method == "should"
+          regex = "#{method} #{regex}\. $"
+        elsif method == "test"
+          regex = "^#{method}: #{regex}$"
+        end
+
+        return [
+          whitespace,
+          regex
+        ]
+      end
     end
     nil
   end
