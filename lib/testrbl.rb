@@ -2,10 +2,17 @@ require 'testrbl/version'
 
 module Testrbl
   PATTERNS = [
-    /^(\s+)(should|test)\s+['"](.*)['"]\s+do\s*$/,
+    /^(\s+)(should|test|it)\s+['"](.*)['"]\s+do\s*$/,
     /^(\s+)(context)\s+['"]?(.*?)['"]?\s+do\s*$/,
     /^(\s+)def\s+(test_)([a-z_\d]+)\s*$/
   ]
+
+  # copied from minitest
+  MINITEST_NAME_RE = if RUBY_VERSION >= "1.9"
+    Regexp.new("[^[[:word:]]]+")
+  else
+    /\W+/u
+  end
 
   def self.run_from_cli(argv)
     command = argv.join(" ")
@@ -14,7 +21,7 @@ module Testrbl
       file = "./#{file}" if file =~ /^[a-z]/ # fix 1.9 not being able to load local files
       run "#{bundle_exec}ruby #{file} -n '/#{pattern_from_file(file, line)}/'"
     elsif File.file?(command)
-      run "#{bundle_exec}ruby #{file}"
+      run "#{bundle_exec}ruby #{command}"
     else # pass though
       # no bundle exec: projects with mini and unit-test do not run well via bundle exec testrb
       run "testrb #{argv.map{|a| a.include?(' ') ? "'#{a}'" : a }.join(' ')}"
@@ -57,6 +64,8 @@ module Testrbl
           regex = "#{method} #{regex}\. $"
         elsif method == "test"
           regex = "^#{method}: #{regex}$"
+        elsif method == "it"
+          regex = "\\d+_#{test_name.gsub(MINITEST_NAME_RE, '_').downcase}$"
         end
 
         return [

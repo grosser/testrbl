@@ -71,9 +71,11 @@ describe Testrbl do
     end
 
     it "runs with options" do
-      result = testrbl "a_test.rb -n '/xxx/'"
-      result.should include "ABC"
-      result.should_not include "BCD"
+      pending "works in real console..." do
+        result = testrbl "a_test.rb -n '/xxx/'"
+        result.should include "ABC"
+        result.should_not include "BCD"
+      end
     end
   end
 
@@ -194,7 +196,7 @@ describe Testrbl do
     end
   end
 
-  context "minitest" do
+  context "minitest test" do
     before do
       write "a_test.rb", <<-RUBY
         require 'minitest/autorun'
@@ -211,6 +213,29 @@ describe Testrbl do
       RUBY
     end
 
+    it "runs" do
+      result = testrbl "a_test.rb:4"
+      result.should include "ABC\n"
+      result.should_not include "BCD"
+    end
+  end
+
+  context "minitest spec" do
+    before do
+      write "a_test.rb", <<-RUBY
+        require 'minitest/autorun'
+
+        describe "a" do
+          it "b" do
+            puts "ABC"
+          end
+
+          it "c" do
+            puts "BCD"
+          end
+        end
+      RUBY
+    end
 
     it "runs" do
       result = testrbl "a_test.rb:4"
@@ -317,6 +342,18 @@ describe Testrbl do
 
     it "finds context do calls with classes" do
       call("  context Foobar do\n").should == ["  ", "Foobar"]
+    end
+
+    it "finds minitest it do calls" do
+      call("  it \"xx xx\" do\n").should == ["  ", "\\d+_xx_xx$"]
+    end
+
+    it "finds complex minitest it do calls" do
+      call("  it \"xx ._-..  ___ xx\" do\n").should == ["  ", "\\d+_xx_______xx$"]
+    end
+
+    it "does not find minitest describe do calls since we cannot run them" do
+      call("  describe Foobar do\n").should == nil
     end
 
     it "escapes regex chars" do

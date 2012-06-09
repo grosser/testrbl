@@ -1,4 +1,4 @@
-Run ruby Test::Unit/Shoulda tests by line-number / folder / the dozen.<br/>
+Run ruby Test::Unit/Shoulda/Minitest tests by line-number / folder / the dozen.<br/>
 (everything not matching "file:line" is simply passed to testrb)
 
 Install
@@ -14,10 +14,6 @@ Usage
 Tips
 ====
  - `can't find executable testrb`: uninstall old version of test-unit, they define testrb in multiple incompatible ways
-
-TODO
-====
- - prepend shoulda contexts to search -n '/OUTER-CONTEXT.*INNER-CONTEXT.*SHOULD/', make sure indentation is decreasing by 1 every step to avoid fetching everything
 
 Author
 ======
