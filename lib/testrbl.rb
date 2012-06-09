@@ -8,24 +8,29 @@ module Testrbl
   ]
 
   def self.run_from_cli(argv)
-    # we only work with 1 file with line-number, everything else gets passed thourgh
-    if argv.join(" ") !~ /^\S+:\d+$/
+    command = argv.join(" ")
+    if command =~ /^\S+:\d+$/
+      file, line = argv.first.split(':')
+      file = "./#{file}" if file =~ /^[a-z]/ # fix 1.9 not being able to load local files
+      run "#{bundle_exec}ruby #{file} -n '/#{pattern_from_file(file, line)}/'"
+    elsif File.file?(command)
+      run "#{bundle_exec}ruby #{file}"
+    else # pass though
+      # no bundle exec: projects with mini and unit-test do not run well via bundle exec testrb
       run "testrb #{argv.map{|a| a.include?(' ') ? "'#{a}'" : a }.join(' ')}"
     end
-
-    file, line = argv.first.split(':')
-    file = "./#{file}" if file =~ /^[a-z]/ # fix 1.9 not being able to load local files
-    run "testrb #{file} -n '/#{pattern_from_file(file, line)}/'"
-  end
-
-  def self.run(command)
-    safe_to_bundle_exec = (File.exist?('Gemfile.lock') and File.read('Gemfile.lock').include?(" test-unit "))
-    command = "#{"bundle exec " if safe_to_bundle_exec}#{command}"
-    puts command
-    exec command
   end
 
   private
+
+  def self.bundle_exec
+    "bundle exec " if File.file?("Gemfile")
+  end
+
+  def self.run(command)
+    puts command
+    exec command
+  end
 
   def self.pattern_from_file(file, line)
     content = File.readlines(file)

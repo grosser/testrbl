@@ -194,6 +194,31 @@ describe Testrbl do
     end
   end
 
+  context "minitest" do
+    before do
+      write "a_test.rb", <<-RUBY
+        require 'minitest/autorun'
+
+        class Xxx < MiniTest::Unit::TestCase
+          def test_xxx
+            puts 'ABC'
+          end
+
+          def test_yyy
+            puts 'BCD'
+          end
+        end
+      RUBY
+    end
+
+
+    it "runs" do
+      result = testrbl "a_test.rb:4"
+      result.should include "ABC\n"
+      result.should_not include "BCD"
+    end
+  end
+
   context "multiple files / folders" do
     before do
       write "a_test.rb", <<-RUBY
