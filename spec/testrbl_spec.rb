@@ -275,7 +275,7 @@ describe Testrbl do
     end
 
     it "finds calls with single quotes" do
-      call("  test 'xx xx' do\n").should == ["  ", "xx xx"]
+      call("  test 'xx xx' do\n").should == ["  ", "^test: xx xx$"]
     end
 
     it "finds test do calls" do
@@ -288,6 +288,10 @@ describe Testrbl do
 
     it "finds context do calls" do
       call("  context \"xx xx\" do\n").should == ["  ", "xx xx"]
+    end
+
+    it "finds context do calls with classes" do
+      call("  context Foobar do\n").should == ["  ", "Foobar"]
     end
 
     it "escapes regex chars" do
