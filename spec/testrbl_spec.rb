@@ -29,7 +29,7 @@ describe Testrbl do
     Testrbl::VERSION.should =~ /^[\.\da-z]+$/
   end
 
-  context "with a simple setup" do
+  context "def test_" do
     before do
       write "a_test.rb", <<-RUBY
         require 'test/unit'
@@ -79,7 +79,7 @@ describe Testrbl do
     end
   end
 
-  context "test with string" do
+  context "test-unit test with string" do
     before do
       write "a_test.rb", <<-RUBY
         require 'test/unit'
@@ -93,7 +93,7 @@ describe Testrbl do
             puts 'BCD'
           end
 
-          test "c d" do
+          test "c -__.BLA:" do
             puts 'CDE'
           end
 
@@ -115,6 +115,58 @@ describe Testrbl do
       result = testrbl "a_test.rb:16"
       result.should_not include "CDE\n"
       result.should include "DEF\n"
+    end
+
+    it "runs complex test names" do
+      result = testrbl "a_test.rb:12"
+      result.should include "CDE\n"
+      result.should_not include "DEF\n"
+    end
+  end
+
+  context "ActiveSupport::TestCase test with string" do
+    before do
+      write "a_test.rb", <<-RUBY
+        require 'test/unit'
+        require 'active_support/test_case'
+
+        class Xxx < ActiveSupport::TestCase
+          test "a" do
+            puts 'ABC'
+          end
+
+          test "b" do
+            puts 'BCD'
+          end
+
+          test "c -__.BLA:" do
+            puts 'CDE'
+          end
+
+          test "c" do
+            puts 'DEF'
+          end
+        end
+      RUBY
+    end
+
+    it "runs test" do
+      result = testrbl "a_test.rb:9"
+      result.should_not include "ABC\n"
+      result.should include "BCD\n"
+      result.should_not include "CDE\n"
+    end
+
+    it "runs test explicitly" do
+      result = testrbl "a_test.rb:17"
+      result.should_not include "CDE\n"
+      result.should include "DEF\n"
+    end
+
+    it "runs complex test names" do
+      result = testrbl "a_test.rb:13"
+      result.should include "CDE\n"
+      result.should_not include "DEF\n"
     end
   end
 
@@ -325,11 +377,15 @@ describe Testrbl do
     end
 
     it "finds calls with single quotes" do
-      call("  test 'xx xx' do\n").should == ["  ", "^test: xx xx$"]
+      call("  test 'xx xx' do\n").should == ["  ", "^test(: |_)xx.xx$"]
     end
 
     it "finds test do calls" do
-      call("  test \"xx xx\" do\n").should == ["  ", "^test: xx xx$"]
+      call("  test \"xx xx\" do\n").should == ["  ", "^test(: |_)xx.xx$"]
+    end
+
+    it "finds complex test do calls" do
+      call("  test \"c -__.BLA:\" do\n").should == ["  ", "^test(: |_)c.\\-__\\.BLA:$"]
     end
 
     it "finds should do calls" do

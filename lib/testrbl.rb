@@ -63,7 +63,10 @@ module Testrbl
         if method == "should"
           regex = "#{method} #{regex}\. $"
         elsif method == "test"
-          regex = "^#{method}: #{regex}$"
+          # test "xxx -_ yyy"
+          # test-unit:     "test: xxx -_ yyy"
+          # activesupport: "test_xxx_-__yyy"
+          regex = "^test(: |_)#{regex.gsub(" ", ".")}$"
         elsif method == "it"
           regex = "\\d+_#{test_name.gsub(MINITEST_NAME_RE, '_').downcase}$"
         end
