@@ -25,6 +25,10 @@ describe Testrbl do
     File.open(file, 'w'){|f| f.write content }
   end
 
+  def read(file)
+    File.read(file)
+  end
+
   it "has a VERSION" do
     Testrbl::VERSION.should =~ /^[\.\da-z]+$/
   end
@@ -79,12 +83,11 @@ describe Testrbl do
     end
   end
 
-  context "test-unit test with string" do
+  context "test with string" do
     before do
       write "a_test.rb", <<-RUBY
-        require 'test/unit'
-
-        class Xxx < Test::Unit::TestCase
+        REQUIRE
+        class Xxx < ANCESTOR
           test "a" do
             puts 'ABC'
           end
@@ -104,69 +107,34 @@ describe Testrbl do
       RUBY
     end
 
-    it "runs test" do
-      result = testrbl "a_test.rb:8"
-      result.should_not include "ABC\n"
-      result.should include "BCD\n"
-      result.should_not include "CDE\n"
-    end
-
-    it "runs test explicitly" do
-      result = testrbl "a_test.rb:16"
-      result.should_not include "CDE\n"
-      result.should include "DEF\n"
-    end
-
-    it "runs complex test names" do
-      result = testrbl "a_test.rb:12"
-      result.should include "CDE\n"
-      result.should_not include "DEF\n"
-    end
-  end
-
-  context "ActiveSupport::TestCase test with string" do
-    before do
-      write "a_test.rb", <<-RUBY
-        require 'test/unit'
-        require 'active_support/test_case'
-
-        class Xxx < ActiveSupport::TestCase
-          test "a" do
-            puts 'ABC'
-          end
-
-          test "b" do
-            puts 'BCD'
-          end
-
-          test "c -__.BLA:" do
-            puts 'CDE'
-          end
-
-          test "c" do
-            puts 'DEF'
-          end
+    [
+      ["Test::Unit::TestCase", "require 'test/unit'\n"],
+      ["ActiveSupport::TestCase", "require 'test/unit'\nrequire 'active_support/test_case'"],
+    ].each do |ancestor, require|
+      context "with #{ancestor}" do
+        before do
+          write("a_test.rb", read("a_test.rb").sub("REQUIRE", require).sub("ANCESTOR", ancestor))
         end
-      RUBY
-    end
 
-    it "runs test" do
-      result = testrbl "a_test.rb:9"
-      result.should_not include "ABC\n"
-      result.should include "BCD\n"
-      result.should_not include "CDE\n"
-    end
+        it "runs test" do
+          result = testrbl "a_test.rb:8"
+          result.should_not include "ABC\n"
+          result.should include "BCD\n"
+          result.should_not include "CDE\n"
+        end
 
-    it "runs test explicitly" do
-      result = testrbl "a_test.rb:17"
-      result.should_not include "CDE\n"
-      result.should include "DEF\n"
-    end
+        it "runs test explicitly" do
+          result = testrbl "a_test.rb:16"
+          result.should_not include "CDE\n"
+          result.should include "DEF\n"
+        end
 
-    it "runs complex test names" do
-      result = testrbl "a_test.rb:13"
-      result.should include "CDE\n"
-      result.should_not include "DEF\n"
+        it "runs complex test names" do
+          result = testrbl "a_test.rb:12"
+          result.should include "CDE\n"
+          result.should_not include "DEF\n"
+        end
+      end
     end
   end
 
