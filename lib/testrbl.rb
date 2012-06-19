@@ -14,6 +14,8 @@ module Testrbl
     /\W+/u
   end
 
+  INTERPOLATION = /\\\#\\\{.*?\\\}/
+
   def self.run_from_cli(argv)
     command = argv.join(" ")
     if command =~ /^\S+:\d+$/
@@ -58,7 +60,7 @@ module Testrbl
     PATTERNS.each do |r|
       if line =~ r
         whitespace, method, test_name = $1, $2, $3
-        regex = Regexp.escape(test_name).gsub("'",".").gsub("\\ "," ")
+        regex = Regexp.escape(test_name).gsub("'",".").gsub("\\ "," ").gsub(INTERPOLATION, ".*")
 
         if method == "should"
           regex = "#{method} #{regex}\. $"

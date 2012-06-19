@@ -356,8 +356,16 @@ describe Testrbl do
       call("  test \"c -__.BLA:\" do\n").should == ["  ", "^test(: |_)c.\\-__\\.BLA:$"]
     end
 
+    it "finds interpolated test do calls" do
+      call("  test \"c\#{111}b\" do\n").should == ["  ", "^test(: |_)c.*b$"]
+    end
+
     it "finds should do calls" do
       call("  should \"xx xx\" do\n").should == ["  ", "should xx xx. $"]
+    end
+
+    it "finds interpolated context do calls" do
+      call("  should \"c\#{111}b\" do\n").should == ["  ", "should c.*b. $"]
     end
 
     it "finds context do calls" do
@@ -366,6 +374,10 @@ describe Testrbl do
 
     it "finds context do calls with classes" do
       call("  context Foobar do\n").should == ["  ", "Foobar"]
+    end
+
+    it "finds interpolated context do calls" do
+      call("  context \"c\#{111}b\" do\n").should == ["  ", "c.*b"]
     end
 
     it "finds minitest it do calls" do
