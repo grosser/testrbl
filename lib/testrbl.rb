@@ -63,7 +63,8 @@ module Testrbl
         regex = Regexp.escape(test_name).gsub("'",".").gsub("\\ "," ").gsub(INTERPOLATION, ".*")
 
         if method == "should"
-          regex = "#{method} #{regex}\. $"
+          optional_test_name = "(?:\(.*\))?"
+          regex = "#{method} #{regex}\. #{optional_test_name}$"
         elsif method == "test"
           # test "xxx -_ yyy"
           # test-unit:     "test: xxx -_ yyy"

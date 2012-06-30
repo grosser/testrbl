@@ -361,11 +361,11 @@ describe Testrbl do
     end
 
     it "finds should do calls" do
-      call("  should \"xx xx\" do\n").should == ["  ", "should xx xx. $"]
+      call("  should \"xx xx\" do\n").should == ["  ", "should xx xx. (?:(.*))?$"]
     end
 
     it "finds interpolated context do calls" do
-      call("  should \"c\#{111}b\" do\n").should == ["  ", "should c.*b. $"]
+      call("  should \"c\#{111}b\" do\n").should == ["  ", "should c.*b. (?:(.*))?$"]
     end
 
     it "finds context do calls" do
