@@ -15,6 +15,10 @@ Tips
 ====
  - `can't find executable testrb`: uninstall old version of test-unit, they define testrb in multiple incompatible ways
 
+TODO
+====
+ - alternate minitest syntax: test_0017_should not link already linked URLs
+
 Author
 ======
 [Michael Grosser](http://grosser.it)<br/>
