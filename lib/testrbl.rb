@@ -21,7 +21,7 @@ module Testrbl
     if command =~ /^\S+:\d+$/
       file, line = argv.first.split(':')
       file = "./#{file}" if file =~ /^[a-z]/ # fix 1.9 not being able to load local files
-      run "#{bundle_exec}ruby #{file} -n '/#{pattern_from_file(file, line)}/'"
+      run "#{bundle_exec}ruby #{file} -n '/#{pattern_from_file(File.readlines(file), line)}/'"
     elsif File.file?(command)
       run "#{bundle_exec}ruby #{command}"
     else # pass though
@@ -41,17 +41,25 @@ module Testrbl
     exec command
   end
 
-  def self.pattern_from_file(file, line)
-    content = File.readlines(file)
-    search = content[0..(line.to_i-1)].reverse
+  def self.pattern_from_file(lines, line)
+    search = lines[0..(line.to_i-1)].reverse
 
     last_spaces = " " * 100
     found = search.map{|line| pattern_from_line(line) }.compact
-    found = found.select do |spaces, name|
+    patterns = found.select do |spaces, name|
       last_spaces = spaces if spaces.size < last_spaces.size
+    end.map(&:last)
+
+    use = []
+    found_final = false
+    patterns.each do |pattern|
+      is_final = pattern.end_with?("$")
+      next if is_final && found_final
+      found_final = is_final
+      use << pattern
     end
 
-    return found.reverse.map(&:last).join(".*") if found.size > 0
+    return use.reverse.join(".*") if found.size > 0
 
     raise "no test found before line #{line}"
   end

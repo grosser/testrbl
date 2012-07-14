@@ -331,6 +331,31 @@ describe Testrbl do
     end
   end
 
+  describe ".pattern_from_file" do
+    def call(content, line)
+      lines = content.split("\n").map{|l| l + "\n" }
+      Testrbl.pattern_from_file(lines, line)
+    end
+
+    after do
+      @result.should include("xxx")
+      @result.should_not include("yyy")
+      @result.should include("zzz")
+    end
+
+    it "does not find nested should calls" do
+      @result = call("  context \"xxx\" do\n    test \"yyy\" do\n    if true do\n      test \"zzz\" do\n", 4)
+    end
+
+    it "does not find nested test calls" do
+      @result = call("  context \"xxx\" do\n    test \"yyy\" do\n    if true do\n      test \"zzz\" do\n", 4)
+    end
+
+    it "does not find nested it calls" do
+      @result = call("  context \"xxx\" do\n    it \"yyy\" do\n    if true do\n      it \"zzz\" do\n", 4)
+    end
+  end
+
   describe ".pattern_from_line" do
     def call(line)
       Testrbl.pattern_from_line(line)
