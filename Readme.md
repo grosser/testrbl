@@ -1,5 +1,6 @@
 Run ruby Test::Unit/Shoulda/Minitest tests by line-number / folder / the dozen.<br/>
-(everything not matching "file:line" is simply passed to testrb)
+(everything not matching "file:line" is simply passed to testrb)<br/>
+Instant execution, 0 wait-time!
 
 Install
 =======
