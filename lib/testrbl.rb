@@ -30,17 +30,7 @@ module Testrbl
     end
   end
 
-  private
-
-  def self.bundle_exec
-    "bundle exec " if File.file?("Gemfile")
-  end
-
-  def self.run(command)
-    puts command
-    exec command
-  end
-
+  # useable e.g. via zeus
   def self.pattern_from_file(lines, line)
     search = lines[0..(line.to_i-1)].reverse
 
@@ -62,6 +52,17 @@ module Testrbl
     return use.reverse.join(".*") if found.size > 0
 
     raise "no test found before line #{line}"
+  end
+
+  private
+
+  def self.bundle_exec
+    "bundle exec " if File.file?("Gemfile")
+  end
+
+  def self.run(command)
+    puts command
+    exec command
   end
 
   def self.pattern_from_line(line)
