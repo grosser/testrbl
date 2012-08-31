@@ -1,6 +1,9 @@
 require 'bundler/gem_tasks'
 
 task :default do
+  # tests do not run with test-unit 1 since it defines testrb and overshadows 1.9s native testrb
+  raise "yes | gem uninstall -a test-unit && bundle" if `gem list test-unit | grep 'test-unit '` =~ /[\( ]1\./
+
   sh "rspec spec/"
 end
 
