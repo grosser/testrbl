@@ -18,6 +18,7 @@ Tips
 
 TODO
 ====
+ - fix tests on ree/1.9.2
  - alternate minitest syntax: test_0017_should not link already linked URLs
 
 Author
