@@ -62,6 +62,7 @@ module Testrbl
 
   def self.run(command)
     puts command
+    STDOUT.flush # if exec fails horribly we at least see some output
     exec command
   end
 

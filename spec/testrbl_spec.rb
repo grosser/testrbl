@@ -75,11 +75,11 @@ describe Testrbl do
     end
 
     it "runs with options" do
-      pending "works in real console..." do
-        result = testrbl "a_test.rb -n '/xxx/'"
-        result.should include "ABC"
-        result.should_not include "BCD"
-      end
+      # TODO does not work with files in root folder ... WTF (only happens with a script that runs testrb)
+      write("foo/a_test.rb", read("a_test.rb"))
+      result = testrbl "foo/a_test.rb -n '/xxx/'"
+      result.should include "ABC"
+      result.should_not include "BCD"
     end
   end
 
