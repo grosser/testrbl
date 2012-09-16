@@ -93,7 +93,7 @@ module Testrbl
           # activesupport: "test_xxx_-__yyy"
           regex = "^test(: |_)#{regex.gsub(" ", ".")}$"
         elsif method == "it"
-          regex = "\\d+_#{test_name.gsub(MINITEST_NAME_RE, '_').downcase}$"
+          regex = "^test_\\d+_#{test_name}$"
         end
 
         return [

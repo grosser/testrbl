@@ -6,7 +6,7 @@ describe Testrbl do
     Dir.chdir "tmp" do
       example.call
     end
-    run "rm -rf tmp"
+    #run "rm -rf tmp"
   end
 
   def run(cmd, options={})
@@ -284,12 +284,12 @@ describe Testrbl do
       write "a_test.rb", <<-RUBY
         require 'minitest/autorun'
 
-        describe "a" do
-          it "b" do
+        describe "a-a" do
+          it "b./_-b" do
             puts "ABC"
           end
 
-          it "c" do
+          it "c-c" do
             puts "BCD"
           end
         end
@@ -445,11 +445,11 @@ describe Testrbl do
     end
 
     it "finds minitest it do calls" do
-      call("  it \"xx xx\" do\n").should == ["  ", "\\d+_xx_xx$"]
+      call("  it \"xx xx\" do\n").should == ["  ", "^test_\\d+_xx xx$"]
     end
 
     it "finds complex minitest it do calls" do
-      call("  it \"xx ._-..  ___ xx\" do\n").should == ["  ", "\\d+_xx_______xx$"]
+      call("  it \"xX ._-..  ___ Xx\" do\n").should == ["  ", "^test_\\d+_xX ._-..  ___ Xx$"]
     end
 
     it "does not find minitest describe do calls since we cannot run them" do
