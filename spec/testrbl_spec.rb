@@ -33,6 +33,45 @@ describe Testrbl do
     Testrbl::VERSION.should =~ /^[\.\da-z]+$/
   end
 
+  context "-Itest" do
+    before do
+      write "a_test.rb", <<-RUBY
+        require 'test/unit'
+        require 'xxx'
+
+        class Xxx < Test::Unit::TestCase
+          def test_xxx
+            puts 'ABC'
+          end
+
+          def test_yyy
+            puts 'BCD'
+          end
+        end
+      RUBY
+      write("test/xxx.rb", "puts 'XXX LOADED'")
+    end
+
+    it "does not include test by default" do
+      result = testrbl "a_test.rb:6", :fail => true
+      result.should_not include "ABC\n"
+    end
+
+    it "can use -Itest for line execution" do
+      result = testrbl "-Itest a_test.rb:6"
+      result.should include "ABC\n"
+      result.should include "XXX LOADED\n"
+      result.should_not include "BCD"
+    end
+
+    it "can use -I test for line execution" do
+      result = testrbl "-I test a_test.rb:6"
+      result.should include "ABC\n"
+      result.should include "XXX LOADED\n"
+      result.should_not include "BCD"
+    end
+  end
+
   context "def test_" do
     before do
       write "a_test.rb", <<-RUBY

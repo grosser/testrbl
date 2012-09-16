@@ -17,13 +17,12 @@ module Testrbl
   INTERPOLATION = /\\\#\\\{.*?\\\}/
 
   def self.run_from_cli(argv)
-    command = argv.join(" ")
-    if command =~ /^\S+:\d+$/
-      file, line = argv.first.split(':')
+    i_test, file, line = detect_usable(argv)
+    if file and line
       file = "./#{file}" if file =~ /^[a-z]/ # fix 1.9 not being able to load local files
-      run "#{bundle_exec}ruby #{file} -n '/#{pattern_from_file(File.readlines(file), line)}/'"
-    elsif File.file?(command)
-      run "#{bundle_exec}ruby #{command}"
+      run "#{bundle_exec}ruby #{i_test}#{file} -n '/#{pattern_from_file(File.readlines(file), line)}/'"
+    elsif file
+      run "#{bundle_exec}ruby #{i_test}#{file}"
     else # pass though
       # no bundle exec: projects with mini and unit-test do not run well via bundle exec testrb
       run "testrb #{argv.map{|a| a.include?(' ') ? "'#{a}'" : a }.join(' ')}"
@@ -55,6 +54,19 @@ module Testrbl
   end
 
   private
+
+  def self.detect_usable(argv)
+    argv = argv.dup # do not mess up args
+    i_test = "-Itest " if ((argv.delete("-I") and argv.delete("test")) or argv.delete("-Itest"))
+
+    return unless argv.size == 1
+
+    if argv.first =~ /^(\S+):(\d+)$/
+      [i_test, $1, $2]
+    elsif File.file?(argv.first)
+      [i_test, argv.first, false]
+    end
+  end
 
   def self.bundle_exec
     "bundle exec " if File.file?("Gemfile")
