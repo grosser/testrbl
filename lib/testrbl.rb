@@ -20,9 +20,9 @@ module Testrbl
     i_test, file, line = detect_usable(argv)
     if file and line
       file = "./#{file}" if file =~ /^[a-z]/ # fix 1.9 not being able to load local files
-      run "#{bundle_exec}ruby #{i_test}#{file} -n '/#{pattern_from_file(File.readlines(file), line)}/'"
+      run "#{ruby} #{i_test}#{file} -n '/#{pattern_from_file(File.readlines(file), line)}/'"
     elsif file
-      run "#{bundle_exec}ruby #{i_test}#{file}"
+      run "#{ruby} #{i_test}#{file}"
     else # pass though
       # no bundle exec: projects with mini and unit-test do not run well via bundle exec testrb
       run "testrb #{argv.map{|a| a.include?(' ') ? "'#{a}'" : a }.join(' ')}"
@@ -68,8 +68,12 @@ module Testrbl
     end
   end
 
-  def self.bundle_exec
-    "bundle exec " if File.file?("Gemfile")
+  def self.ruby
+    if File.file?("Gemfile")
+      "ruby -rbundler/setup" # faster then bundle exec ruby
+    else
+      "ruby"
+    end
   end
 
   def self.run(command)
