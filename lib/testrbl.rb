@@ -25,7 +25,7 @@ module Testrbl
       run "#{ruby} #{i_test}#{file}"
     else # pass though
       # no bundle exec: projects with mini and unit-test do not run well via bundle exec testrb
-      run "testrb #{argv.map{|a| a.include?(' ') ? "'#{a}'" : a }.join(' ')}"
+      run ["testrb"] + argv
     end
   end
 
@@ -77,9 +77,10 @@ module Testrbl
   end
 
   def self.run(command)
-    puts command
+    command = [*command]
+    puts command.join(" ")
     STDOUT.flush # if exec fails horribly we at least see some output
-    exec command
+    Kernel.exec *command
   end
 
   def self.pattern_from_line(line)
