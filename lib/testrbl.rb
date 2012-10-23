@@ -19,10 +19,12 @@ module Testrbl
   def self.run_from_cli(argv)
     i_test, file, line = detect_usable(argv)
     if file and line
-      file = "./#{file}" if file =~ /^[a-z]/ # fix 1.9 not being able to load local files
+      file = localize(file)
       run "#{ruby} #{i_test}#{file} -n '/#{pattern_from_file(File.readlines(file), line)}/'"
     elsif file
       run "#{ruby} #{i_test}#{file}"
+    elsif argv.all?{|f| File.file?(f) }
+      run "#{ruby} #{argv.map{|f| "-r #{localize(f)}" }.join(" ")} -e ''"
     else # pass though
       # no bundle exec: projects with mini and unit-test do not run well via bundle exec testrb
       run ["testrb"] + argv
@@ -54,6 +56,11 @@ module Testrbl
   end
 
   private
+
+  # fix 1.9 not being able to load local files
+  def self.localize(file)
+    file =~ /^[-a-z\d_]/ ? "./#{file}" : file
+  end
 
   def self.detect_usable(argv)
     argv = argv.dup # do not mess up args
