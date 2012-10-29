@@ -2,9 +2,9 @@ require 'testrbl/version'
 
 module Testrbl
   PATTERNS = [
-    /^(\s+)(should|test|it)\s+['"](.*)['"]\s+do\s*$/,
-    /^(\s+)(context)\s+['"]?(.*?)['"]?\s+do\s*$/,
-    /^(\s+)def\s+(test_)([a-z_\d]+)\s*$/
+    /^(\s+)(should|test|it)\s+['"](.*)['"]\s+do\s*(?:#.*)?$/,
+    /^(\s+)(context)\s+['"]?(.*?)['"]?\s+do\s*(?:#.*)?$/,
+    /^(\s+)def\s+(test_)([a-z_\d]+)\s*(?:#.*)?$/
   ]
 
   # copied from minitest

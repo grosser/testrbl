@@ -135,12 +135,16 @@ describe Testrbl do
             puts 'BCD'
           end
 
-          test "c -__.BLA:" do
+          test "c -__.BLA:" do # line 12
             puts 'CDE'
           end
 
-          test "c" do
+          test "c" do # line 16
             puts 'DEF'
+          end
+
+          test "x / y" do # line 20
+            puts "XY"
           end
         end
       RUBY
@@ -171,6 +175,12 @@ describe Testrbl do
         it "runs complex test names" do
           result = testrbl "a_test.rb:12"
           result.should include "CDE\n"
+          result.should_not include "DEF\n"
+        end
+
+        it "runs with / in name" do
+          result = testrbl "a_test.rb:20"
+          result.should include "XY\n"
           result.should_not include "DEF\n"
         end
       end
@@ -438,6 +448,10 @@ describe Testrbl do
 
     it "finds complex test do calls" do
       call("  test \"c -__.BLA:\" do\n").should == ["  ", "^test(: |_)c.\\-__\\.BLA:$"]
+    end
+
+    it "finds test do calls with comments" do
+      call("  test \"x / y\" do # line 20\n").should == ["  ", "^test(: |_)x./.y$"]
     end
 
     it "finds interpolated test do calls" do
