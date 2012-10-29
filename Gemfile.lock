@@ -1,12 +1,13 @@
 PATH
   remote: .
   specs:
-    testrbl (0.1.16)
+    testrbl (0.1.17)
 
 GEM
   remote: http://rubygems.org/
   specs:
     activesupport (2.3.14)
+    bump (0.3.3)
     diff-lcs (1.1.3)
     minitest (3.4.0)
     rake (0.9.2.2)
@@ -30,6 +31,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport (= 2.3.14)
+  bump
   minitest
   rake
   rspec (~> 2)
