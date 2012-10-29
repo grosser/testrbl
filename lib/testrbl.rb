@@ -23,7 +23,7 @@ module Testrbl
       run "#{ruby} #{i_test}#{file} -n '/#{pattern_from_file(File.readlines(file), line)}/'"
     elsif file
       run "#{ruby} #{i_test}#{file}"
-    elsif argv.all?{|f| File.file?(f) }
+    elsif argv.all?{|f| File.file?(f) } # testrb has a lot of weird issues vs test-unit, so try to avoid it
       run "#{ruby} #{argv.map{|f| "-r #{localize(f)}" }.join(" ")} -e ''"
     else # pass though
       # no bundle exec: projects with mini and unit-test do not run well via bundle exec testrb
