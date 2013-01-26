@@ -15,20 +15,18 @@ module Testrbl
   end
 
   INTERPOLATION = /\\\#\\\{.*?\\\}/
+  PATTERN = /^(\S+):(\d+)$/
 
   def self.run_from_cli(argv)
-    i_test, file, line = detect_usable(argv)
-    if file and line
-      file = localize(file)
-      run "#{ruby} #{i_test}#{file} -n '/#{pattern_from_file(File.readlines(file), line)}/'"
-    elsif file
-      run "#{ruby} #{i_test}#{file}"
-    elsif argv.all?{|f| File.file?(f) } # testrb has a lot of weird issues vs test-unit, so try to avoid it
-      run "#{ruby} #{argv.map{|f| "-r #{localize(f)}" }.join(" ")} -e ''"
-    else # pass though
-      # no bundle exec: projects with mini and unit-test do not run well via bundle exec testrb
-      run ["testrb"] + argv
+    file, line = extract_file_and_line!(argv)
+    if file && line
+      pattern = pattern_from_file(File.readlines(file), line)
+      argv << file
+      argv << "-n"
+      argv << "/#{pattern}/"
     end
+
+    run_tests(argv)
   end
 
   # useable e.g. via zeus
@@ -57,37 +55,31 @@ module Testrbl
 
   private
 
+  def self.extract_file_and_line!(argv)
+    argv.each_with_index do |arg, i|
+      if arg =~ PATTERN && File.file?($1)
+        argv.delete_at(i)
+        return $1, $2
+      end
+    end
+    nil
+  end
+
+  def self.run_tests(argv)
+    require "bundler/setup" if File.file?("Gemfile")
+    require "test/unit"
+
+    runner = Test::Unit::AutoRunner.new(true)
+    if runner.process_args(argv)
+      exit runner.run
+    else
+      abort runner.options.banner + " tests..."
+    end
+  end
+
   # fix 1.9 not being able to load local files
   def self.localize(file)
     file =~ /^[-a-z\d_]/ ? "./#{file}" : file
-  end
-
-  def self.detect_usable(argv)
-    argv = argv.dup # do not mess up args
-    i_test = "-Itest " if ((argv.delete("-I") and argv.delete("test")) or argv.delete("-Itest"))
-
-    return unless argv.size == 1
-
-    if argv.first =~ /^(\S+):(\d+)$/
-      [i_test, $1, $2]
-    elsif File.file?(argv.first)
-      [i_test, argv.first, false]
-    end
-  end
-
-  def self.ruby
-    if File.file?("Gemfile")
-      "ruby -rbundler/setup" # faster then bundle exec ruby
-    else
-      "ruby"
-    end
-  end
-
-  def self.run(command)
-    command = [*command]
-    puts command.join(" ")
-    STDOUT.flush # if exec fails horribly we at least see some output
-    Kernel.exec *command
   end
 
   def self.pattern_from_line(line)

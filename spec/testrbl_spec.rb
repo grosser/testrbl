@@ -183,6 +183,12 @@ describe Testrbl do
           result.should include "XY\n"
           result.should_not include "DEF\n"
         end
+
+        it "supports -v options" do
+          result = testrbl "a_test.rb -v"
+          result.should include("ABC")
+          result.should include("-__.BLA") # test name
+        end
       end
     end
   end
@@ -377,26 +383,6 @@ describe Testrbl do
       result.should_not include "BCD\n"
       result.should include "CDE\n"
       result.should include "DEF\n"
-    end
-
-    context "avoiding testrb" do
-      before do
-        write "backtrace_test.rb", <<-RUBY
-          puts caller
-        RUBY
-      end
-
-      it "does not run via testrb if possible" do
-        result = testrbl "a/b/c_test.rb backtrace_test.rb"
-        result.should include("CDE")
-        result.should_not include("bin/testrb:")
-      end
-
-      it "runs via testrb if not possible via ruby" do
-        result = testrbl "a/b/c_test.rb backtrace_test.rb -v"
-        result.should include("CDE")
-        result.should include("bin/testrb:")
-      end
     end
   end
 
