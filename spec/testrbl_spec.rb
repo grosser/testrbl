@@ -383,18 +383,27 @@ describe Testrbl do
       before do
         write "backtrace_test.rb", <<-RUBY
           puts caller
+          require 'test/unit'
+
+          class Xxx1 < Test::Unit::TestCase
+            def test_xxx
+              puts 'BACKTRACE'
+            end
+          end
         RUBY
       end
 
       it "does not run via testrb if possible" do
-        result = testrbl "a/b/c_test.rb backtrace_test.rb"
+        result = testrbl "-Itest -I lib a/b/c_test.rb backtrace_test.rb -v"
         result.should include("CDE")
+        result.should include("BACKTRACE")
         result.should_not include("bin/testrb:")
       end
 
-      it "runs via testrb if not possible via ruby" do
-        result = testrbl "a/b/c_test.rb backtrace_test.rb -v"
+      it "runs via testrb if unavoidable" do
+        result = testrbl "a/b/c_test.rb backtrace_test.rb -n '/xxx/'"
         result.should include("CDE")
+        result.should include("BACKTRACE")
         result.should include("bin/testrb:")
       end
     end

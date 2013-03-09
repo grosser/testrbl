@@ -7,7 +7,7 @@ module Testrbl
     /^(\s+)def\s+(test_)([a-z_\d]+)\s*(?:#.*)?$/
   ]
 
-  OPTION_WITH_ARGUMENT = ["-I", "-r", "-n"]
+  OPTION_WITH_ARGUMENT = ["-I", "-r", "-n", "-e"]
 
   # copied from minitest
   MINITEST_NAME_RE = if RUBY_VERSION >= "1.9"
@@ -19,21 +19,21 @@ module Testrbl
   INTERPOLATION = /\\\#\\\{.*?\\\}/
 
   def self.run_from_cli(argv)
-    file, line, options = detect_usable(argv)
+    files, options = partition_argv(argv)
+    files = files.map { |f| localize(f) }
+    load_options, options = partition_options(options)
 
-    if file
-      load_options, options = extract_load_options(options)
-      if line
-        file = localize(file)
-        run(ruby + load_options + [file, "-n", "/#{pattern_from_file(File.readlines(file), line)}/"] + options)
-      else
-        run(ruby + load_options + [file] + options)
+    if files.size == 1 and files.first =~ /^(\S+):(\d+)$/
+      file = $1
+      line = $2
+      run(ruby + load_options + [file, "-n", "/#{pattern_from_file(File.readlines(file), line)}/"] + options)
+    else
+      if files.all? { |f| File.file?(f) } and options.none? { |arg| arg =~ /^-n/ }
+        run(ruby + load_options + files.map { |f| "-r#{f}" } + options + ["-e", ""])
+      else # pass though
+        # no bundle exec: projects with mini and unit-test do not run well via bundle exec testrb
+        run ["testrb"] + argv
       end
-    elsif argv.all? { |f| File.file?(f) } # multiple files without arguments # TODO use parse
-      run(ruby + argv.map { |f| "-r#{localize(f)}" } + ["-e", ""])
-    else # pass though
-      # no bundle exec: projects with mini and unit-test do not run well via bundle exec testrb
-      run ["testrb"] + argv
     end
   end
 
@@ -63,7 +63,7 @@ module Testrbl
 
   private
 
-  def self.extract_load_options(options)
+  def self.partition_options(options)
     next_is_before = false
     options.partition do |option|
       if next_is_before
@@ -83,18 +83,6 @@ module Testrbl
   # fix 1.9 not being able to load local files
   def self.localize(file)
     file =~ /^[-a-z\d_]/ ? "./#{file}" : file
-  end
-
-  def self.detect_usable(argv)
-    files, options = partition_argv(argv)
-
-    return unless files.size == 1
-
-    if files.first =~ /^(\S+):(\d+)$/
-      [$1, $2, options]
-    elsif File.file?(files.first)
-      [files.first, false, options]
-    end
   end
 
   def self.partition_argv(argv)
