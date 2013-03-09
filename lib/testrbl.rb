@@ -37,28 +37,27 @@ module Testrbl
     end
   end
 
-  # useable e.g. via zeus
+  # usable via external tools like zeus
   def self.pattern_from_file(lines, line)
-    search = lines[0..(line.to_i-1)].reverse
+    possible_lines = lines[0..(line.to_i-1)].reverse
 
     last_spaces = " " * 100
-    found = search.map{|line| pattern_from_line(line) }.compact
+    found = possible_lines.map { |line| test_pattern_from_line(line) }.compact
+
+    # pattern and the groups it is nested under (like describe - describe - it)
     patterns = found.select do |spaces, name|
       last_spaces = spaces if spaces.size < last_spaces.size
     end.map(&:last)
 
-    use = []
-    found_final = false
-    patterns.each do |pattern|
-      is_final = pattern.end_with?("$")
-      next if is_final && found_final
-      found_final = is_final
-      use << pattern
-    end
-
-    return use.reverse.join(".*") if found.size > 0
+    return filter_duplicate_final(patterns).reverse.join(".*") if found.size > 0
 
     raise "no test found before line #{line}"
+  end
+
+  # only keep 1 pattern that stops matching via $
+  def self.filter_duplicate_final(patterns)
+    found_final = 0
+    patterns.reject { |p| p.end_with?("$") and (found_final += 1) > 1 }
   end
 
   private
@@ -117,16 +116,16 @@ module Testrbl
     Kernel.exec *command
   end
 
-  def self.pattern_from_line(line)
+  def self.test_pattern_from_line(line)
     PATTERNS.each do |r|
       next unless line =~ r
       whitespace, method, test_name = $1, $2, $3
-      return [whitespace, pattern_from_match(method, test_name)]
+      return [whitespace, test_pattern_from_match(method, test_name)]
     end
     nil
   end
 
-  def self.pattern_from_match(method, test_name)
+  def self.test_pattern_from_match(method, test_name)
     regex = Regexp.escape(test_name).gsub("\\ "," ").gsub(INTERPOLATION, ".*")
 
     if method == "should"

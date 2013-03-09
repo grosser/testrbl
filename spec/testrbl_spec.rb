@@ -409,7 +409,7 @@ describe Testrbl do
     end
   end
 
-  describe ".pattern_from_file" do
+  describe ".test_pattern_from_file" do
     def call(content, line)
       lines = content.split("\n").map{|l| l + "\n" }
       Testrbl.pattern_from_file(lines, line)
@@ -434,9 +434,9 @@ describe Testrbl do
     end
   end
 
-  describe ".pattern_from_line" do
+  describe ".test_pattern_from_line" do
     def call(line)
-      Testrbl.pattern_from_line(line)
+      Testrbl.test_pattern_from_line(line)
     end
 
     it "finds simple tests" do
