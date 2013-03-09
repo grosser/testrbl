@@ -498,4 +498,34 @@ describe Testrbl do
       call("  context \"xx ' xx\" do\n").should == ["  ", "xx . xx"]
     end
   end
+
+  describe ".partition_argv" do
+    def call(*args)
+      Testrbl.send(:partition_argv, *args)
+    end
+
+    it "finds files" do
+      call(["xxx"]).should == [["xxx"], []]
+    end
+
+    it "finds files after multi-space options" do
+      call(["-I", "test", "xxx"]).should == [["xxx"], ["-I", "test"]]
+    end
+
+    it "finds options" do
+      call(["-I", "test"]).should == [[], ["-I", "test"]]
+    end
+
+    it "finds --verbose" do
+      call(["--verbose", "test"]).should == [["test"], ["--verbose"]]
+    end
+
+    it "finds -- options" do
+      call(["--foo", "test"]).should == [["test"], ["--foo"]]
+    end
+
+    it "finds mashed options" do
+      call(["-Itest"]).should == [[], ["-Itest"]]
+    end
+  end
 end

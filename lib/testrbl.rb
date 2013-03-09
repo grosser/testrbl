@@ -17,14 +17,19 @@ module Testrbl
   INTERPOLATION = /\\\#\\\{.*?\\\}/
 
   def self.run_from_cli(argv)
-    i_test, file, line = detect_usable(argv)
+    options, file, line = detect_usable(argv)
+
     if file and line
       file = localize(file)
-      run "#{ruby} #{i_test}#{file} -n '/#{pattern_from_file(File.readlines(file), line)}/'"
+      run(ruby + options + [file, "-n", "/#{pattern_from_file(File.readlines(file), line)}/"])
+
     elsif file
-      run "#{ruby} #{i_test}#{file}"
-    elsif argv.all?{|f| File.file?(f) } # testrb has a lot of weird issues vs test-unit, so try to avoid it
-      run "#{ruby} #{argv.map{|f| "-r #{localize(f)}" }.join(" ")} -e ''"
+      run(ruby + [file] + options)
+
+    # TODO use parse
+    elsif argv.all? { |f| File.file?(f) } # multiple files without arguments
+      run(ruby + argv.map { |f| "-r#{localize(f)}" } + ["-e", ""])
+
     else # pass though
       # no bundle exec: projects with mini and unit-test do not run well via bundle exec testrb
       run ["testrb"] + argv
@@ -63,28 +68,44 @@ module Testrbl
   end
 
   def self.detect_usable(argv)
-    argv = argv.dup # do not mess up args
-    i_test = "-Itest " if ((argv.delete("-I") and argv.delete("test")) or argv.delete("-Itest"))
+    files, options = partition_argv(argv)
 
-    return unless argv.size == 1
+    return unless files.size == 1
 
-    if argv.first =~ /^(\S+):(\d+)$/
-      [i_test, $1, $2]
-    elsif File.file?(argv.first)
-      [i_test, argv.first, false]
+    if files.first =~ /^(\S+):(\d+)$/
+      [options, $1, $2]
+    elsif File.file?(files.first)
+      [options, files.first, false]
+    end
+  end
+
+  def self.partition_argv(argv)
+    next_is_option = false
+    argv.partition do |arg|
+      if next_is_option
+        next_is_option = false
+      else
+        if arg =~ /^-.$/ or  arg =~ /^--/ # single letter option followed by argument like -I test or long options like --verbose
+          next_is_option = true if ["-I", "-r", "-n"].include?(arg)
+          false
+        elsif arg =~ /^-/ # multi letter option like -Itest
+          false
+        else
+          true
+        end
+      end
     end
   end
 
   def self.ruby
     if File.file?("Gemfile")
-      "ruby -rbundler/setup" # faster then bundle exec ruby
+      ["ruby", "-rbundler/setup"] # faster then bundle exec ruby
     else
-      "ruby"
+      ["ruby"]
     end
   end
 
   def self.run(command)
-    command = [*command]
     puts command.join(" ")
     STDOUT.flush # if exec fails horribly we at least see some output
     Kernel.exec *command
