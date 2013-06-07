@@ -296,20 +296,51 @@ describe Testrbl do
 
         describe "a-a" do
           it "b./_-b" do
-            puts "ABC"
+            puts "-ABC-"
           end
 
           it "c-c" do
-            puts "BCD"
+            puts "-BCD-"
+          end
+
+          describe "a-b" do
+            it "d-d" do
+              puts "-CDE-"
+            end
+
+            it "d-e" do
+              puts "-DEF-"
+            end
+          end
+        end
+
+        describe "a-c" do
+          it "b./_-d" do
+            puts "-EFG-"
           end
         end
       RUBY
     end
 
+    def run_line(number)
+      result = testrbl "a_test.rb:#{number}"
+      result.scan(/-[A-Z]{3}-/).map { |s| s.gsub("-", "") }.sort
+    end
+
     it "runs" do
-      result = testrbl "a_test.rb:4"
-      result.should include "ABC\n"
-      result.should_not include "BCD"
+      run_line("4").should == ["ABC"]
+    end
+
+    it "runs describes" do
+      run_line("3").should == ["ABC", "BCD", "CDE", "DEF"]
+    end
+
+    it "runs nested describes" do
+      run_line("12").should == ["CDE", "DEF"]
+    end
+
+    it "runs nested it" do
+      run_line("13").should == ["CDE"]
     end
   end
 
@@ -488,15 +519,15 @@ describe Testrbl do
     end
 
     it "finds minitest it do calls" do
-      call("  it \"xx xx\" do\n").should == ["  ", "^test_\\d+_xx xx$"]
+      call("  it \"xx xx\" do\n").should == ["  ", "#test_\\d+_xx xx$"]
     end
 
     it "finds complex minitest it do calls" do
-      call("  it \"xX ._-..  ___ Xx\" do\n").should == ["  ", "^test_\\d+_xX ._-..  ___ Xx$"]
+      call("  it \"xX ._-..  ___ Xx\" do\n").should == ["  ", "#test_\\d+_xX ._-..  ___ Xx$"]
     end
 
-    it "does not find minitest describe do calls since we cannot run them" do
-      call("  describe Foobar do\n").should == nil
+    it "finds minitest describe do calls" do
+      call("  describe Foobar do\n").should == ["  ", "Foobar(::)?"]
     end
 
     it "escapes regex chars" do

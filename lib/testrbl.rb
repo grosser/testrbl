@@ -3,19 +3,11 @@ require 'testrbl/version'
 module Testrbl
   PATTERNS = [
     /^(\s+)(should|test|it)\s+['"](.*)['"]\s+do\s*(?:#.*)?$/,
-    /^(\s+)(context)\s+['"]?(.*?)['"]?\s+do\s*(?:#.*)?$/,
+    /^(\s+)(context|describe)\s+['"]?(.*?)['"]?\s+do\s*(?:#.*)?$/,
     /^(\s+)def\s+(test_)([a-z_\d]+)\s*(?:#.*)?$/
   ]
 
   OPTION_WITH_ARGUMENT = ["-I", "-r", "-n", "-e"]
-
-  # copied from minitest
-  MINITEST_NAME_RE = if RUBY_VERSION >= "1.9"
-    Regexp.new("[^[[:word:]]]+")
-  else
-    /\W+/u
-  end
-
   INTERPOLATION = /\\\#\\\{.*?\\\}/
 
   def self.run_from_cli(argv)
@@ -128,16 +120,21 @@ module Testrbl
   def self.test_pattern_from_match(method, test_name)
     regex = Regexp.escape(test_name).gsub("\\ "," ").gsub(INTERPOLATION, ".*")
 
-    if method == "should"
+    regex = case method
+    when "should"
       optional_test_name = "(?:\(.*\))?"
-      regex = "#{method} #{regex}\. #{optional_test_name}$"
-    elsif method == "test"
+      "#{method} #{regex}\. #{optional_test_name}$"
+    when "describe"
+      "#{test_name}(::)?"
+    when "test"
       # test "xxx -_ yyy"
       # test-unit:     "test: xxx -_ yyy"
       # activesupport: "test_xxx_-__yyy"
-      regex = "^test(: |_)#{regex.gsub(" ", ".")}$"
-    elsif method == "it"
-      regex = "^test_\\d+_#{test_name}$"
+      "^test(: |_)#{regex.gsub(" ", ".")}$"
+    when "it"
+      "#test_\\d+_#{test_name}$"
+    else
+      regex
     end
 
     regex.gsub("'", ".")
