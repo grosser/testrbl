@@ -20,7 +20,9 @@ module Testrbl
       line = $2
       run(ruby + load_options + [file, "-n", "/#{pattern_from_file(File.readlines(file), line)}/"] + options)
     else
-      if files.all? { |f| File.file?(f) } and options.none? { |arg| arg =~ /^-n/ }
+      if files.size == 1 and File.file?(files.first)
+        run(ruby + load_options + files + options)
+      elsif files.all? { |f| File.file?(f) } and options.none? { |arg| arg =~ /^-n/ }
         run(ruby + load_options + files.map { |f| "-r#{f}" } + options + ["-e", ""])
       else # pass though
         # no bundle exec: projects with mini and unit-test do not run well via bundle exec testrb
