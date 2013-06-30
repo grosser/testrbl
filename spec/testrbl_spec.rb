@@ -440,6 +440,55 @@ describe Testrbl do
     end
   end
 
+  context "--changed" do
+    before do
+      write "test/a_test.rb", "puts 'ABC'"
+      write "test/b_test.rb", "puts 'BCD'"
+      write "foo.rb", "raise 'BCD'"
+      run %{git init && git add -A && git commit -am 'initial'}
+    end
+
+    it "can run with other stuff" do
+      write "bar.rb", "puts 'CDE'"
+      result = testrbl("bar.rb --changed")
+      result.should include "CDE"
+      result.should_not include "ABC"
+    end
+
+    it "runs new files" do
+      write "test/b_test.rb", "puts 'CDE'"
+      write "test/c_test.rb", "puts 'DEF'"
+      result = testrbl("--changed")
+      result.should include "CDE"
+      result.should include "DEF"
+      result.should_not include "ABC"
+      result.should_not include "BCD"
+    end
+
+    it "runs changed files" do
+      write "test/b_test.rb", "puts 'BCD' # changed"
+      result = testrbl("--changed")
+      result.should include "BCD"
+      result.should_not include "ABC"
+    end
+
+    it "runs staged files" do
+      write "test/b_test.rb", "puts 'BCD' # changed"
+      run "git add test/b_test.rb"
+      result = testrbl("--changed")
+      result.should include "BCD"
+      result.should_not include "ABC"
+    end
+
+    it "does not run removed files" do
+      run "rm test/b_test.rb"
+      write "test/c_test.rb", "puts 'DEF'"
+      result = testrbl("--changed")
+      result.should include "DEF"
+      result.should_not include "ABC"
+    end
+  end
+
   describe ".test_pattern_from_file" do
     def call(content, line)
       lines = content.split("\n").map{|l| l + "\n" }

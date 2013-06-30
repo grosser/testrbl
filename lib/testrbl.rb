@@ -12,6 +12,7 @@ module Testrbl
 
   def self.run_from_cli(argv)
     files, options = partition_argv(argv)
+    files.concat(changed_files) if options.delete("--changed")
     files = files.map { |f| localize(f) }
     load_options, options = partition_options(options)
 
@@ -94,6 +95,12 @@ module Testrbl
         end
       end
     end
+  end
+
+  def self.changed_files
+    changed_files = `git status -s`.split("\n").map { |l| l.strip.split(/\s+/, 2)[1] }
+    raise "Failed: #{changed_files}" unless $?.success?
+    changed_files.select { |f| f =~ /_(test|spec)\.rb$/ && File.exist?(f) }
   end
 
   def self.ruby

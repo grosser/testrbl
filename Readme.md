@@ -11,6 +11,7 @@ Usage
     testrbl test/unit/xxx_test.rb:123 # test by line number
     testrbl test/unit                 # everything _test.rb in a folder (on 1.8 this would be test/unit/*)
     testrbl xxx_test.rb yyy_test.rb   # multiple files
+    testrbl --changed                 # run changed tests
 
 Tips
 ====
