@@ -36,13 +36,13 @@ module Testrbl
   def self.pattern_from_file(lines, line)
     possible_lines = lines[0..(line.to_i-1)].reverse
 
-    last_spaces = " " * 100
-    found = possible_lines.map { |line| test_pattern_from_line(line) }.compact
+    found = possible_lines.map { |line| test_pattern_from_line(line) || block_start_from_line(line) }.compact
 
     # pattern and the groups it is nested under (like describe - describe - it)
+    last_spaces = " " * 100
     patterns = found.select do |spaces, name|
       last_spaces = spaces if spaces.size < last_spaces.size
-    end.map(&:last)
+    end.map(&:last).compact
 
     return filter_duplicate_final(patterns).reverse.join(".*") if found.size > 0
 
@@ -115,6 +115,12 @@ module Testrbl
     puts command.join(" ")
     STDOUT.flush # if exec fails horribly we at least see some output
     Kernel.exec *command
+  end
+
+  def self.block_start_from_line(line)
+    if line =~ /^(\s*).* do( \|.*\|)?$/
+      [$1, nil]
+    end
   end
 
   def self.test_pattern_from_line(line)

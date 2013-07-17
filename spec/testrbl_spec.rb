@@ -512,6 +512,14 @@ describe Testrbl do
     it "does not find nested it calls" do
       @result = call("  context \"xxx\" do\n    it \"yyy\" do\n    if true do\n      it \"zzz\" do\n", 4)
     end
+
+    it "does not find nested non-test blocks" do
+      @result = call("  context \"yyy\" do\n  end\n  blub do\n    context \"xxx\" do\n      it \"zzz\" do\n", 5)
+    end
+
+    it "does not find nested non-test blocks" do
+      @result = call("  context \"yyy\" do\n  end\n  blub do\n    context \"xxx\" do\n      it \"zzz\" do\n      end\n    end\n  end\n", 8)
+    end
   end
 
   describe ".test_pattern_from_line" do
