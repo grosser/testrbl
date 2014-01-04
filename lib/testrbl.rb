@@ -23,7 +23,8 @@ module Testrbl
     else
       if files.size == 1 and File.file?(files.first)
         run(ruby + load_options + files + options)
-      elsif files.all? { |f| File.file?(f) } and options.none? { |arg| arg =~ /^-n/ }
+      elsif options.none? { |arg| arg =~ /^-n/ }
+        files = files.map { |f| File.directory?(f) ? all_test_files_in(f) : f }.flatten
         run(ruby + load_options + files.map { |f| "-r#{f}" } + options + ["-e", ""])
       else # pass though
         # no bundle exec: projects with mini and unit-test do not run well via bundle exec testrb
@@ -56,6 +57,10 @@ module Testrbl
   end
 
   private
+
+  def self.all_test_files_in(folder)
+    Dir[File.join(folder, "{**/,}*_{test,spec}.rb")]
+  end
 
   def self.partition_options(options)
     next_is_before = false

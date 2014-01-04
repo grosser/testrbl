@@ -346,6 +346,11 @@ describe Testrbl do
 
   context "multiple files / folders" do
     before do
+      write "Gemfile", <<-RUBY
+        source "https://rubygems.org"
+        gem "test-unit"
+      RUBY
+
       write "a_test.rb", <<-RUBY
         require 'test/unit'
 
@@ -432,7 +437,7 @@ describe Testrbl do
       end
 
       it "runs via testrb if unavoidable" do
-        result = testrbl "a/b/c_test.rb backtrace_test.rb -n '/xxx/'"
+        result = Bundler.with_clean_env { testrbl "a/b/c_test.rb backtrace_test.rb -n '/xxx/'" }
         result.should include("CDE")
         result.should include("BACKTRACE")
         result.should include("bin/testrb:")
