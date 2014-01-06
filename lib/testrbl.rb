@@ -59,7 +59,7 @@ module Testrbl
   private
 
   def self.all_test_files_in(folder)
-    Dir[File.join(folder, "{**/,}*_{test,spec}.rb")]
+    Dir[File.join(folder, "{**/,}*_{test,spec}.rb")].uniq
   end
 
   def self.partition_options(options)
