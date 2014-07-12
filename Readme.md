@@ -4,14 +4,19 @@ Instant execution, 0 wait-time!
 
 Install
 =======
-    gem install testrbl
+```Bash
+gem install testrbl
+```
 
 Usage
 =====
-    testrbl test/unit/xxx_test.rb:123 # test by line number
-    testrbl test/unit                 # everything _test.rb in a folder (on 1.8 this would be test/unit/*)
-    testrbl xxx_test.rb yyy_test.rb   # multiple files
-    testrbl --changed                 # run changed tests
+
+```Bash
+testrbl test/unit/xxx_test.rb:123 # test by line number
+testrbl test/unit                 # everything _test.rb in a folder (on 1.8 this would be test/unit/*)
+testrbl xxx_test.rb yyy_test.rb   # multiple files
+testrbl --changed                 # run changed tests
+```
 
 Tips
 ====
@@ -19,7 +24,6 @@ Tips
 
 TODO
 ====
- - fix tests on ree/1.9.2
  - alternate minitest syntax: test_0017_should not link already linked URLs
 
 Author
@@ -27,4 +31,4 @@ Author
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
 License: MIT<br/>
-[![Build Status](https://secure.travis-ci.org/grosser/testrbl.png)](http://travis-ci.org/grosser/testrbl)
+[![Build Status](https://travis-ci.org/grosser/testrbl.png)](https://travis-ci.org/grosser/testrbl)
