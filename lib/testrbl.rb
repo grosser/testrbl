@@ -19,7 +19,7 @@ module Testrbl
     if files.size == 1 and files.first =~ /^(\S+):(\d+)$/
       file = $1
       line = $2
-      run(ruby + load_options + [file, "-n", "/#{pattern_from_file(File.readlines(file), line)}/"] + options)
+      run(ruby + load_options + line_pattern_option(file, line) + options)
     else
       if files.size == 1 and File.file?(files.first)
         run(ruby + load_options + files + options)
@@ -31,6 +31,11 @@ module Testrbl
         run ["testrb"] + argv
       end
     end
+  end
+
+  # overwritten by maxitest to just return line
+  def self.line_pattern_option(file, line)
+    [file, "-n", "/#{pattern_from_file(File.readlines(file), line)}/"]
   end
 
   # usable via external tools like zeus
