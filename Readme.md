@@ -8,6 +8,11 @@ Install
 gem install testrbl
 ```
 
+or standalone
+```Bash
+curl https://rubinjam.herokuapp.com/pack/testrbl > testrbl && chmod +x testrbl
+```
+
 Usage
 =====
 
