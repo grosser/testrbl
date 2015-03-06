@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    testrbl (0.5.1)
+    testrbl (0.5.2)
 
 GEM
   remote: https://rubygems.org/
