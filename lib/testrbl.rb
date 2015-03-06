@@ -7,7 +7,7 @@ module Testrbl
     /^(\s+)def\s+(test_)([a-z_\d]+)\s*(?:#.*)?$/
   ]
 
-  OPTION_WITH_ARGUMENT = ["-I", "-r", "-n", "-e"]
+  OPTION_WITH_ARGUMENT = ["-I", "-r", "-n", "-e", "--seed"]
   INTERPOLATION = /\\\#\\\{.*?\\\}/
 
   def self.run_from_cli(argv)
