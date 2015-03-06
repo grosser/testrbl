@@ -1,12 +1,9 @@
 require 'spec_helper'
+require 'tmpdir'
 
 describe Testrbl do
   around do |example|
-    run "rm -rf tmp && mkdir tmp"
-    Dir.chdir "tmp" do
-      example.call
-    end
-    #run "rm -rf tmp"
+    Dir.mktmpdir { |dir| Dir.chdir(dir, &example) }
   end
 
   def run(cmd, options={})
@@ -69,6 +66,32 @@ describe Testrbl do
       result.should include "ABC\n"
       result.should include "XXX LOADED\n"
       result.should_not include "BCD"
+    end
+  end
+
+  context "--seed" do
+    before do
+      2.times do |i|
+        write "#{i}_test.rb", <<-RUBY
+          require 'minitest/autorun'
+
+          class Xxx#{i} < Minitest::Test
+            def test_xxx
+              puts 'ABC'
+            end
+          end
+        RUBY
+      end
+    end
+
+    it "seeds a single file" do
+      result = testrbl "0_test.rb:6 --seed 1234"
+      result.should include "1234"
+    end
+
+    it "seeds multiple files" do
+      result = Bundler.with_clean_env { testrbl "0_test.rb 1_test.rb --seed 1234" } # adding --seed triggers minitest to be loaded in a weird way and then the second version is loaded via bundler :/
+      result.should include "1234"
     end
   end
 
