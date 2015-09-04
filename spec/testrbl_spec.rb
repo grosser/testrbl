@@ -552,7 +552,7 @@ describe Testrbl do
 
   describe ".test_pattern_from_line" do
     def call(line)
-      Testrbl.test_pattern_from_line(line)
+      Testrbl.send(:test_pattern_from_line, line)
     end
 
     it "finds simple tests" do
