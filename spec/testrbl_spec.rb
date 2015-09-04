@@ -603,12 +603,18 @@ describe Testrbl do
       call("  context \"c\#{111}b\" do\n").should == ["  ", "c.*b"]
     end
 
-    it "finds minitest it do calls" do
-      call("  it \"xx xx\" do\n").should == ["  ", "#test_\\d+_xx xx$"]
-    end
+    describe "minitest id do" do
+      it "finds simple" do
+        call("  it \"xx xx\" do\n").should == ["  ", "#test_\\d+_xx xx$"]
+      end
 
-    it "finds complex minitest it do calls" do
-      call("  it \"xX ._-..  ___ Xx\" do\n").should == ["  ", "#test_\\d+_xX ._-..  ___ Xx$"]
+      it "finds complex" do
+        call("  it \"xX ._-..  ___ Xx\" do\n").should == ["  ", "#test_\\d+_xX \\._\\-\\.\\.  ___ Xx$"]
+      end
+
+      it "finds with pecial characters" do
+        call("  it \"hmm? it's weird\\\"?\" do\n").should == ["  ", "#test_\\d+_hmm\\? it.s weird\\\\\"\\?$"]
+      end
     end
 
     it "finds minitest describe do calls" do

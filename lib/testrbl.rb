@@ -157,12 +157,12 @@ module Testrbl
         # activesupport: "test_xxx_-__yyy"
         "^test(: |_)#{regex.gsub(" ", ".")}$"
       elsif method == "describe" || (method == "context" && !via_shoulda?)
-        "#{test_name}(::)?"
+        "#{regex}(::)?"
       elsif method == "should" && via_shoulda?
         optional_test_name = "(?:\(.*\))?"
         "#{method} #{regex}\. #{optional_test_name}$"
       elsif ["it", "should"].include?(method) # minitest aliases for shoulda
-        "#test_\\d+_#{test_name}$"
+        "#test_\\d+_#{regex}$"
       else
         regex
       end
