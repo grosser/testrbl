@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    testrbl (0.6.0)
+    testrbl (0.6.1)
 
 GEM
   remote: https://rubygems.org/
@@ -38,3 +38,6 @@ DEPENDENCIES
   shoulda
   test-unit
   testrbl!
+
+BUNDLED WITH
+   1.11.2
