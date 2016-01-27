@@ -38,6 +38,3 @@ DEPENDENCIES
   shoulda
   test-unit
   testrbl!
-
-BUNDLED WITH
-   1.10.6

@@ -7,7 +7,7 @@ module Testrbl
     /^(\s+)def\s+(test_)([a-z_\d]+)\s*(?:#.*)?$/
   ]
 
-  OPTION_WITH_ARGUMENT = ["-I", "-r", "-n", "-e", "--seed"]
+  OPTION_WITH_ARGUMENT = ["-I", "-r", "-n", "-e", "--seed", "-s"]
   INTERPOLATION = /\\\#\\\{.*?\\\}/
 
   class << self

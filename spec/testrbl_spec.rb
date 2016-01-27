@@ -89,6 +89,11 @@ describe Testrbl do
       result.should include "1234"
     end
 
+    it "seeds with -s" do
+      result = testrbl "0_test.rb:6 -s 1234"
+      result.should include "1234"
+    end
+
     it "seeds multiple files" do
       result = Bundler.with_clean_env { testrbl "0_test.rb 1_test.rb --seed 1234" } # adding --seed triggers minitest to be loaded in a weird way and then the second version is loaded via bundler :/
       result.should include "1234"
