@@ -520,6 +520,12 @@ describe Testrbl do
       result.should include "DEF"
       result.should_not include "ABC"
     end
+
+    it "runs last commit when no files are changed" do
+      result = testrbl("--changed")
+      result.should include "ABC"
+      result.should include "BCD"
+    end
   end
 
   describe ".test_pattern_from_file" do
