@@ -346,6 +346,10 @@ describe Testrbl do
           it "b./_-d" do
             puts "-EFG-"
           end
+
+          it("f-g") do
+            puts "-HIJ-"
+          end
         end
       RUBY
     end
@@ -369,6 +373,10 @@ describe Testrbl do
 
     it "runs nested it" do
       run_line("13").should == ["CDE"]
+    end
+
+    it "runs it with parens" do
+      run_line("28").should == ["HIJ"]
     end
   end
 
