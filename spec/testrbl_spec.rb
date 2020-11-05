@@ -351,6 +351,12 @@ describe Testrbl do
             puts "-HIJ-"
           end
         end
+
+        describe("h-j") do
+          it "i-k" do
+            puts "-KLM-"
+          end
+        end
       RUBY
     end
 
@@ -377,6 +383,10 @@ describe Testrbl do
 
     it "runs it with parens" do
       run_line("28").should == ["HIJ"]
+    end
+
+    it "runs describe with parens" do
+      run_line("33").should == ["KLM"]
     end
   end
 
