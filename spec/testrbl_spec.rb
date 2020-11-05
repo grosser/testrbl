@@ -346,6 +346,16 @@ describe Testrbl do
           it "b./_-d" do
             puts "-EFG-"
           end
+
+          it("f-g") do
+            puts "-HIJ-"
+          end
+        end
+
+        describe("h-j") do
+          it "i-k" do
+            puts "-KLM-"
+          end
         end
       RUBY
     end
@@ -369,6 +379,14 @@ describe Testrbl do
 
     it "runs nested it" do
       run_line("13").should == ["CDE"]
+    end
+
+    it "runs it with parens" do
+      run_line("28").should == ["HIJ"]
+    end
+
+    it "runs describe with parens" do
+      run_line("33").should == ["KLM"]
     end
   end
 
@@ -623,7 +641,7 @@ describe Testrbl do
         call("  it \"xX ._-..  ___ Xx\" do\n").should == ["  ", "#test_\\d+_xX \\._\\-\\.\\.  ___ Xx$"]
       end
 
-      it "finds with pecial characters" do
+      it "finds with special characters" do
         call("  it \"hmm? it's weird\\\"?\" do\n").should == ["  ", "#test_\\d+_hmm\\? it.s weird\\\\\"\\?$"]
       end
     end
