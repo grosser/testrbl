@@ -623,7 +623,7 @@ describe Testrbl do
         call("  it \"xX ._-..  ___ Xx\" do\n").should == ["  ", "#test_\\d+_xX \\._\\-\\.\\.  ___ Xx$"]
       end
 
-      it "finds with pecial characters" do
+      it "finds with special characters" do
         call("  it \"hmm? it's weird\\\"?\" do\n").should == ["  ", "#test_\\d+_hmm\\? it.s weird\\\\\"\\?$"]
       end
     end
