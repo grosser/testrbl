@@ -440,6 +440,14 @@ describe Testrbl do
       RUBY
     end
 
+    it "runs everything when nothing was given" do
+      File.rename "a", "test"
+      result = testrbl ""
+      result.should_not include "ABC\n"
+      result.should include "BCD\n"
+      result.should include "CDE\n"
+    end
+
     it "runs a folder with subfolders" do
       result = testrbl "a"
       result.should_not include "ABC\n"

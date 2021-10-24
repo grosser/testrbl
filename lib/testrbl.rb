@@ -14,6 +14,7 @@ module Testrbl
     def run_from_cli(argv)
       files, options = partition_argv(argv)
       files.concat(changed_files) if options.delete("--changed")
+      files = ["test"] if files.empty?
       files = files.map { |f| localize(f) }
       load_options, options = partition_options(options)
 
