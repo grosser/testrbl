@@ -36,4 +36,4 @@ Author
 [Michael Grosser](http://grosser.it)<br/>
 michael@grosser.it<br/>
 License: MIT<br/>
-[![Build Status](https://travis-ci.org/grosser/testrbl.png)](https://travis-ci.org/grosser/testrbl)
+[![CI](https://github.com/grosser/testrbl/actions/workflows/actions.yml/badge.svg)](https://github.com/grosser/testrbl/actions/workflows/actions.yml?query=branch%3Amaster)
