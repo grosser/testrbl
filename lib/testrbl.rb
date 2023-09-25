@@ -133,7 +133,7 @@ module Testrbl
     end
 
     def ruby
-      if File.file?("Gemfile")
+      if File.file?(ENV["BUNDLE_GEMFILE"] || "Gemfile")
         ["ruby", "-rbundler/setup"] # faster then bundle exec ruby
       else
         ["ruby"]
